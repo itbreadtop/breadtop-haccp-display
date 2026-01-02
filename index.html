@@ -1,141 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-  <meta charset="UTF-8" />
-  <title>Breadtop Production Queue</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<meta charset="UTF-8">
+<title>Breadtop Production Queue</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      background: #0b1020;
-      color: #fff;
-      font-family: system-ui, -apple-system, Arial;
-    }
+<style>
+body {
+  margin: 0;
+  background: #111;
+  color: #fff;
+  font-family: Arial, "Noto Sans TC", sans-serif;
+}
 
-    .wrap {
-      padding: 20px;
-    }
+h1 {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 42px;
+}
 
-    h1 {
-      margin: 0 0 5px;
-      font-size: 28px;
-    }
+#updated {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 20px;
+}
 
-    .meta {
-      color: #bbb;
-      margin-bottom: 15px;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
+.card {
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 220px;
+}
 
-    .card {
-      background: #111a33;
-      border-radius: 14px;
-      padding: 14px;
-      position: relative;
-      border-left: 10px solid #2ecc71;
-    }
+.green { background: #1e7f43; }
+.red { background: #a11f1f; }
+.yellow { background: #a67c00; }
 
-    .urgent {
-      animation: blink 1s infinite;
-    }
+.product-zh {
+  font-size: 28px;
+  font-weight: bold;
+}
 
-    @keyframes blink {
-      50% { border-left-color: #ff0000; }
-    }
+.product-en {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
 
-    .product-zh {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .product-en {
-      font-size: 14px;
-      color: #bbb;
-      margin-bottom: 10px;
-    }
-
-    .row {
-      margin: 6px 0;
-      font-size: 16px;
-    }
-
-    .label {
-      color: #aaa;
-    }
-  </style>
+.line {
+  font-size: 20px;
+  margin-top: 6px;
+}
+</style>
 </head>
 
 <body>
-<div id="root"></div>
+
+<h1>📺 生產 → 包裝 即時顯示板</h1>
+<div id="updated">Loading…</div>
+
+<div class="grid" id="queue"></div>
 
 <script>
-const e = React.createElement;
+function loadQueue() {
+  fetch("./queue.json?ts=" + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error("JSON load failed");
+      return r.json();
+    })
+    .then(data => {
+      document.getElementById("updated").innerText =
+        "更新時間：" + data.generated_at;
 
-function Card({item}) {
-  return e("div", {
-    className: "card " + (item.priority === "urgent" ? "urgent" : ""),
-    style: { borderLeftColor: item.color }
-  }, [
-    e("div", { className: "product-zh" }, item.product_zh),
-    e("div", { className: "product-en" }, item.product_en),
+      const box = document.getElementById("queue");
+      box.innerHTML = "";
 
-    e("div", { className: "row" },
-      e("span", { className: "label" }, "批次 Batch： "),
-      item.batch_no
-    ),
+      data.queue.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card " + item.color;
 
-    e("div", { className: "row" },
-      e("span", { className: "label" }, "數量 Qty： "),
-      item.batch_count + " 批"
-    ),
+        card.innerHTML = `
+          <div class="product-zh">${item.product_zh}</div>
+          <div class="product-en">${item.product_en}</div>
 
-    e("div", { className: "row" },
-      e("span", { className: "label" }, "下一步 Next： "),
-      item.next_stage
-    ),
+          <div class="line">批次：${item.batch_no}</div>
+          <div class="line">數量：${item.batch_count} 批</div>
+          <div class="line">下一步：${item.next_stage}</div>
+          <div class="line">狀態：準備好 ✅</div>
+        `;
 
-    e("div", { className: "row" },
-      e("span", { className: "label" }, "狀態 Status： "),
-      "準備好 READY ✅"
-    )
-  ]);
+        box.appendChild(card);
+      });
+    })
+    .catch(err => {
+      document.getElementById("updated").innerText =
+        "❌ queue.json 無法載入";
+      console.error(err);
+    });
 }
 
-function App() {
-  const [data, setData] = React.useState(null);
-
-  async function load() {
-    const res = await fetch("queue.json?ts=" + Date.now());
-    const json = await res.json();
-    setData(json);
-  }
-
-  React.useEffect(() => {
-    load();
-    setInterval(load, 30000); // auto refresh
-  }, []);
-
-  if (!data) return e("div", null, "Loading...");
-
-  return e("div", { className: "wrap" }, [
-    e("h1", null, "生產隊列 Production Queue"),
-    e("div", { className: "meta" },
-      `日期 ${data.date} ｜ 更新 ${data.generated_at}`
-    ),
-    e("div", { className: "grid" },
-      data.queue.map((q, i) => e(Card, { item: q, key: i }))
-    )
-  ]);
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+loadQueue();
+setInterval(loadQueue, 30000); // 每 30 秒 refresh
 </script>
+
 </body>
 </html>
