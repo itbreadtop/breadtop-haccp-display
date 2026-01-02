@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Breadtop Production Queue</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+}
+h1 { text-align: center; }
+.card {
+  border: 2px solid #444;
+  padding: 16px;
+  margin: 12px;
+  border-radius: 10px;
+}
+.waiting { background: #1e1e1e; }
+.urgent { background: #8b0000; }
+</style>
+</head>
+
+<body>
+<h1>🍞 Breadtop Production Queue</h1>
+<div id="queue"></div>
+
+<script>
+function render(data) {
+  const box = document.getElementById("queue");
+  box.innerHTML = "";
+
+  data.queue.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card " + (item.status === "URGENT" ? "urgent" : "waiting");
+    div.innerHTML = `
+      <h2>${item.product}</h2>
+      <p>Batch: ${item.batch_no}</p>
+      <p>Next: ${item.next_stage}</p>
+      <p>Status: ${item.status}</p>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function refresh() {
+  fetch("queue.json?_=" + Date.now())
+    .then(r => r.json())
+    .then(render);
+}
+
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
