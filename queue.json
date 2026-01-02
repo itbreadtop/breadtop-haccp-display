@@ -1,21 +1,62 @@
 {
-  "last_updated": "2025-12-31 14:30",
+  "date": "2025-12-08",
+  "generated_at": "2025-12-08 16:05",
   "queue": [
     {
-      "batch_no": "20251231",
-      "product": "Swiss Roll (GT)",
-      "department": "Sponge",
-      "next_stage": "Decorating",
-      "status": "WAITING",
-      "priority": "NORMAL"
+      "product": "Boston Cake",
+      "batch_no": "20251208",
+      "batch_count": 2,
+      "source_file": "HACCP_BostonCake_20251208_batch2.txt",
+      "next_stage": "Packing",
+      "status": "READY"
     },
     {
-      "batch_no": "20251231",
       "product": "Chiffon Cake",
-      "department": "Packing",
+      "batch_no": "20251208",
+      "batch_count": 3,
+      "source_file": "HACCP_ChiffonCake_20251208_batch3.txt",
       "next_stage": "Packing",
-      "status": "URGENT",
-      "priority": "HIGH"
+      "status": "READY"
+    },
+    {
+      "product": "JP Chiffon Cake 5inch - Pandan",
+      "batch_no": "20251208",
+      "batch_count": 4,
+      "source_file": "HACCP_JPChiffonCake5inch-Pandan_20251208_batch4.txt",
+      "next_stage": "Packing",
+      "status": "READY"
+    },
+    {
+      "product": "JP Chiffon Cake 5inch (Paper Cup)",
+      "batch_no": "20251208",
+      "batch_count": 4,
+      "source_file": "HACCP_JPChiffonCake5inch(PaperCup)_20251208_batch4.txt",
+      "next_stage": "Packing",
+      "status": "READY"
+    },
+    {
+      "product": "Plain Sponge",
+      "batch_no": "20251208",
+      "batch_count": 17,
+      "source_file": "HACCP_PlainSponge_20251208_batch17.txt",
+      "next_stage": "Packing",
+      "status": "READY"
+    },
+    {
+      "product": "Rainbow Sponge",
+      "batch_no": "20251208",
+      "batch_count": 15,
+      "source_file": "HACCP_RainbowSponge_20251208_batch15.txt",
+      "next_stage": "Packing",
+      "status": "READY"
+    },
+    {
+      "product": "Swiss Roll (GT)",
+      "batch_no": "20251208",
+      "batch_count": 20,
+      "source_file": "HACCP_SwissRoll(GT)_20251208_batch20.txt",
+      "next_stage": "Packing",
+      "status": "READY"
     }
   ]
 }
