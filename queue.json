@@ -7,11 +7,10 @@
       "product_zh": "波士頓蛋糕",
       "batch_no": "20251208",
       "batch_count": 2,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
+      "next_stage_en": "Ready for Packing",
+      "next_stage_zh": "準備包裝",
       "status_en": "READY",
       "status_zh": "準備好",
-      "priority": "normal",
       "color": "green"
     },
     {
@@ -19,47 +18,10 @@
       "product_zh": "戚風蛋糕",
       "batch_no": "20251208",
       "batch_count": 3,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
+      "next_stage_en": "Ready for Decorating",
+      "next_stage_zh": "準備裝飾",
       "status_en": "READY",
       "status_zh": "準備好",
-      "priority": "urgent",
-      "color": "red"
-    },
-    {
-      "product_en": "JP Chiffon Cake 5inch - Pandan",
-      "product_zh": "日式 5 吋香蘭戚風蛋糕",
-      "batch_no": "20251208",
-      "batch_count": 4,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
-      "status_en": "READY",
-      "status_zh": "準備好",
-      "priority": "normal",
-      "color": "green"
-    },
-    {
-      "product_en": "Plain Sponge",
-      "product_zh": "原味海綿蛋糕",
-      "batch_no": "20251208",
-      "batch_count": 17,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
-      "status_en": "READY",
-      "status_zh": "準備好",
-      "priority": "normal",
-      "color": "green"
-    },
-    {
-      "product_en": "Rainbow Sponge",
-      "product_zh": "彩虹海綿蛋糕",
-      "batch_no": "20251208",
-      "batch_count": 15,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
-      "status_en": "READY",
-      "status_zh": "準備好",
-      "priority": "normal",
       "color": "yellow"
     },
     {
@@ -67,12 +29,11 @@
       "product_zh": "瑞士卷（GT）",
       "batch_no": "20251208",
       "batch_count": 20,
-      "next_stage_en": "Packing",
-      "next_stage_zh": "包裝",
+      "next_stage_en": "Ready for Mixing",
+      "next_stage_zh": "準備攪拌",
       "status_en": "READY",
       "status_zh": "準備好",
-      "priority": "normal",
-      "color": "green"
+      "color": "blue"
     }
   ]
 }
