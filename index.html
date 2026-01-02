@@ -1,247 +1,275 @@
 <!doctype html>
 <html lang="zh-HK">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breadtop Production Queue</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breadtop HACCP Production Board</title>
 
-  <!-- Auto refresh page every 60s (optional) -->
-  <meta http-equiv="refresh" content="300">
+    <!-- React (CDN) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <style>
-    :root{
-      --bg:#0b0b0b;
-      --card:#1b1b1b;
-      --text:#f2f2f2;
-      --muted:#c9c9c9;
-      --border:#3a3a3a;
-    }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
-      background: linear-gradient(#0b0b0b, #111);
-      color:var(--text);
-    }
-    header{
-      text-align:center;
-      padding:28px 16px 18px;
-      font-size:40px;
-      font-weight:800;
-      letter-spacing:0.5px;
-    }
-    .sub{
-      text-align:center;
-      color:var(--muted);
-      margin-top:-8px;
-      font-size:16px;
-    }
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:18px 18px 40px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:18px;
-    }
-    .card{
-      border:2px solid var(--border);
-      background: rgba(27,27,27,0.85);
-      border-radius:14px;
-      padding:20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    }
-    .card.red{ background:#7a0000; border-color:#ff6b6b; }
-    .card.green{ background:#0f3b18; border-color:#6bff8b; }
-    .card.yellow{ background:#4a3c00; border-color:#ffe27a; }
-    .card.gray{ background:rgba(27,27,27,0.85); border-color:#3a3a3a; }
+    <style>
+      :root{
+        --bg:#0b1020;
+        --card:#111a33;
+        --text:#e9ecf5;
+        --muted:#b8c0d9;
+        --line:rgba(255,255,255,0.10);
 
-    .title-zh{
-      font-size:34px;
-      font-weight:900;
-      margin:0 0 6px 0;
-      line-height:1.1;
-    }
-    .title-en{
-      font-size:18px;
-      color:rgba(255,255,255,0.85);
-      margin:0 0 14px 0;
-    }
-    .row{
-      display:flex;
-      gap:12px;
-      align-items:baseline;
-      margin:8px 0;
-      font-size:18px;
-    }
-    .label{
-      width:84px;
-      color:rgba(255,255,255,0.85);
-      font-weight:700;
-    }
-    .value{
-      flex:1;
-      font-weight:700;
-    }
-    .status{
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,0.18);
-      font-size:18px;
-      font-weight:800;
-    }
-    .badge{
-      display:inline-block;
-      padding:2px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.14);
-      margin-left:8px;
-      font-size:14px;
-      font-weight:800;
-    }
-    footer{
-      text-align:center;
-      color:rgba(255,255,255,0.6);
-      padding:18px;
-      font-size:14px;
-    }
-  </style>
-</head>
-
-<body>
-  <header>🍞 Breadtop Production Queue</header>
-  <div class="sub" id="subline">Loading…</div>
-
-  <div class="wrap">
-    <div class="grid" id="cards"></div>
-  </div>
-
-  <footer>This display is automatically generated and maintained by the Breadtop HACCP IT System.</footer>
-
-  <script>
-    // ✅ 你只要放一個 JSON 檔喺 repo，例如：queue.json
-    //    然後改呢度嘅路徑就得
-    const JSON_URL = "queue.json";
-
-    function statusText(status){
-      // 你可以按需要擴充
-      if(!status) return "狀態：—";
-      const s = status.toUpperCase();
-      if(s === "READY") return "狀態：準備好 ✅";
-      if(s === "WAITING") return "狀態：等候中 ⏳";
-      if(s === "IN_PROGRESS") return "狀態：進行中 🔧";
-      if(s === "DONE") return "狀態：完成 ✅";
-      return `狀態：${status}`;
-    }
-
-    function stageText(stage){
-      // 中英混排
-      if(!stage) return "—";
-      const map = {
-        "Packing": "包裝 Packing",
-        "Decorating": "裝飾 Decorating",
-        "Cooling": "冷卻 Cooling",
-        "Mixing": "攪拌 Mixing"
-      };
-      return map[stage] || stage;
-    }
-
-    function colorClass(item){
-      // item.color: red/green/yellow/gray
-      const c = (item.color || "").toLowerCase();
-      if(["red","green","yellow","gray"].includes(c)) return c;
-      // fallback by priority
-      const p = (item.priority || "").toLowerCase();
-      if(p === "urgent") return "red";
-      return "gray";
-    }
-
-    function render(data){
-      const date = data.date || "";
-      const gen = data.generated_at || "";
-      document.getElementById("subline").textContent =
-        (date ? `日期：${date}` : "") + (gen ? `  ｜更新：${gen}` : "");
-
-      const cards = document.getElementById("cards");
-      cards.innerHTML = "";
-
-      const items = data.queue || [];
-      if(items.length === 0){
-        cards.innerHTML = `<div class="card gray">
-          <div class="title-zh">今日冇待處理項目</div>
-          <div class="title-en">No pending items today</div>
-        </div>`;
-        return;
+        --ready:#1f8a4c;
+        --processing:#b98500;
+        --hold:#b53a3a;
       }
 
-      for(const it of items){
-        const div = document.createElement("div");
-        div.className = `card ${colorClass(it)}`;
-
-        const zh = it.product_zh || it.product_en || "（未命名產品）";
-        const en = it.product_en || "";
-
-        div.innerHTML = `
-          <div class="title-zh">${escapeHtml(zh)}</div>
-          ${en ? `<div class="title-en">${escapeHtml(en)}</div>` : `<div class="title-en">&nbsp;</div>`}
-
-          <div class="row">
-            <div class="label">批次：</div>
-            <div class="value">${escapeHtml(it.batch_no || "-")}</div>
-          </div>
-
-          <div class="row">
-            <div class="label">數量：</div>
-            <div class="value">${escapeHtml(String(it.batch_count ?? "-"))} 批</div>
-          </div>
-
-          <div class="row">
-            <div class="label">下一步：</div>
-            <div class="value">${escapeHtml(stageText(it.next_stage))}</div>
-          </div>
-
-          <div class="status">
-            ${escapeHtml(statusText(it.status))}
-            ${it.priority ? `<span class="badge">${escapeHtml(String(it.priority).toUpperCase())}</span>` : ``}
-          </div>
-        `;
-        cards.appendChild(div);
+      *{box-sizing:border-box}
+      body{
+        margin:0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "PingFang HK", "Microsoft JhengHei", sans-serif;
+        background:linear-gradient(180deg, #060a14, var(--bg));
+        color:var(--text);
       }
-    }
 
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    async function load(){
-      try{
-        // cache-bust to force refresh without waiting GitHub cache
-        const url = JSON_URL + "?t=" + Date.now();
-        const res = await fetch(url, { cache: "no-store" });
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-        render(data);
-      }catch(e){
-        document.getElementById("subline").textContent = "載入失敗：請檢查 queue.json 是否存在／格式是否正確";
-        document.getElementById("cards").innerHTML = `
-          <div class="card red">
-            <div class="title-zh">讀取資料失敗</div>
-            <div class="title-en">Failed to load data</div>
-            <div class="row"><div class="label">原因：</div><div class="value">${escapeHtml(e.message)}</div></div>
-          </div>
-        `;
+      .wrap{
+        padding:18px 22px;
       }
-    }
 
-    load();
-    // Auto refresh JSON every 30s (recommended on TV)
-    setInterval(load, 30000);
-  </script>
-</body>
+      .topbar{
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom:14px;
+      }
+
+      .title{
+        font-size:28px;
+        font-weight:800;
+        letter-spacing:0.2px;
+      }
+
+      .subtitle{
+        color:var(--muted);
+        font-size:14px;
+        margin-top:2px;
+      }
+
+      .meta{
+        text-align:right;
+        color:var(--muted);
+        font-size:14px;
+        line-height:1.35;
+      }
+
+      /* 3 per row on wide screens */
+      .grid{
+        display:grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap:14px;
+      }
+
+      /* responsive fallback */
+      @media (max-width: 1200px){
+        .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 820px){
+        .grid{ grid-template-columns: 1fr; }
+      }
+
+      .card{
+        background:rgba(17,26,51,0.85);
+        border:1px solid var(--line);
+        border-radius:16px;
+        padding:14px 14px 12px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.25);
+        overflow:hidden;
+        position:relative;
+        min-height: 170px;
+      }
+
+      .statusBar{
+        position:absolute;
+        left:0; top:0; right:0;
+        height:8px;
+      }
+
+      .row{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:10px;
+      }
+
+      .pname-zh{
+        font-size:22px;
+        font-weight:900;
+        line-height:1.15;
+        margin:2px 0 4px;
+      }
+      .pname-en{
+        font-size:14px;
+        color:var(--muted);
+        margin:0 0 10px;
+      }
+
+      .badge{
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:13px;
+        font-weight:800;
+        border:1px solid var(--line);
+        white-space:nowrap;
+      }
+
+      .kv{
+        display:grid;
+        grid-template-columns: 92px 1fr;
+        gap:8px 10px;
+        font-size:15px;
+        margin-top:6px;
+      }
+      .k{
+        color:var(--muted);
+      }
+      .v{
+        font-weight:800;
+      }
+
+      .next{
+        margin-top:10px;
+        padding-top:10px;
+        border-top:1px dashed var(--line);
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+      }
+
+      .nextText{
+        font-size:15px;
+      }
+
+      .hint{
+        margin-top:10px;
+        color:var(--muted);
+        font-size:13px;
+      }
+
+      .empty{
+        color:var(--muted);
+        padding:24px;
+        border:1px dashed var(--line);
+        border-radius:14px;
+        text-align:center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script>
+      const e = React.createElement;
+
+      function statusLabel(status){
+        const s = (status || "").toUpperCase();
+        if(s === "READY") return { zh:"準備好", en:"READY", color:"var(--ready)" };
+        if(s === "PROCESSING") return { zh:"進行中", en:"PROCESSING", color:"var(--processing)" };
+        if(s === "HOLD") return { zh:"暫停", en:"HOLD", color:"var(--hold)" };
+        return { zh:"未知", en:"UNKNOWN", color:"rgba(255,255,255,0.25)" };
+      }
+
+      function safe(v, fallback="—"){
+        if(v === null || v === undefined || v === "") return fallback;
+        return String(v);
+      }
+
+      function Card({item}){
+        const st = statusLabel(item.status);
+
+        return e("div", { className:"card" },
+          e("div", { className:"statusBar", style:{ background: st.color } }),
+
+          e("div", { className:"row" },
+            e("div", null,
+              e("div", { className:"pname-zh" }, safe(item.product_zh)),
+              e("div", { className:"pname-en" }, safe(item.product_en))
+            ),
+            e("div", { className:"badge", style:{ borderColor: st.color, color: st.color } },
+              `${st.zh} ✅ / ${st.en}`
+            )
+          ),
+
+          e("div", { className:"kv" },
+            e("div", { className:"k" }, "批次 Batch"),
+            e("div", { className:"v" }, safe(item.batch)),
+
+            e("div", { className:"k" }, "數量 Qty"),
+            e("div", { className:"v" }, `${safe(item.quantity)} 批 / batches`),
+
+            e("div", { className:"k" }, "部門 Dept"),
+            e("div", { className:"v" }, safe(item.department, "Sponge/Cake"))
+          ),
+
+          e("div", { className:"next" },
+            e("div", { className:"nextText" },
+              `下一步 Next: ${safe(item.next_stage_zh, "包裝")} / ${safe(item.next_stage_en, "Packing")}`
+            ),
+            e("div", { className:"k" },
+              item.ready_at ? `Ready @ ${item.ready_at}` : ""
+            )
+          ),
+
+          e("div", { className:"hint" },
+            "Powered by Breadtop HACCP IT System"
+          )
+        );
+      }
+
+      function App(){
+        const [data, setData] = React.useState({ date:"", updated_at:"", items:[] });
+        const [err, setErr] = React.useState("");
+
+        async function load(){
+          try{
+            setErr("");
+            // cache bust
+            const url = "daily_production.json?ts=" + Date.now();
+            const res = await fetch(url, { cache:"no-store" });
+            if(!res.ok) throw new Error("Cannot load JSON");
+            const json = await res.json();
+            setData(json);
+          }catch(ex){
+            setErr(String(ex));
+          }
+        }
+
+        React.useEffect(() => {
+          load();
+          const t = setInterval(load, 30000); // 30s refresh
+          return () => clearInterval(t);
+        }, []);
+
+        return e("div", { className:"wrap" },
+          e("div", { className:"topbar" },
+            e("div", null,
+              e("div", { className:"title" }, "Breadtop Production Display / 生產顯示板"),
+              e("div", { className:"subtitle" }, "Auto-refresh every 30s • 多裝置同步 • 中英對照")
+            ),
+            e("div", { className:"meta" },
+              e("div", null, `Date: ${safe(data.date, "—")}`),
+              e("div", null, `Updated: ${safe(data.updated_at, "—")}`),
+              err ? e("div", { style:{ color:"#ffb4b4" } }, `Error: ${err}`) : null
+            )
+          ),
+
+          (data.items && data.items.length)
+            ? e("div", { className:"grid" }, data.items.map((it, idx) => e(Card, { item: it, key: idx })))
+            : e("div", { className:"empty" }, "暫時未有今日生產資料 / No items yet")
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+    </script>
+  </body>
 </html>
