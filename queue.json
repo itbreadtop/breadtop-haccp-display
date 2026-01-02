@@ -4,7 +4,7 @@
   "queue": [
     {
       "product_en": "Boston Cake",
-      "product_zh": "波士頓蛋糕",
+      "product_zh": "波士頓蛋糕 ",
       "batch_no": "20251208",
       "batch_count": 2,
       "next_stage": "Packing",
