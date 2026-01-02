@@ -91,7 +91,12 @@ function loadQueue() {
 
           <div class="line">批次：${item.batch_no}</div>
           <div class="line">數量：${item.batch_count} 批</div>
-          <div class="line">下一步：${item.next_stage}</div>
+          <div class="row">
+            <span class="label">下一步 Next Stage：</span>
+            <span class="value">
+              ${item.next_stage_zh} / ${item.next_stage_en}
+            </span>
+          </div>
           <div class="line">狀態：準備好 ✅</div>
         `;
 
