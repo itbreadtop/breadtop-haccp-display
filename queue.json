@@ -1,0 +1,21 @@
+{
+  "last_updated": "2025-12-31 14:30",
+  "queue": [
+    {
+      "batch_no": "20251231",
+      "product": "Swiss Roll (GT)",
+      "department": "Sponge",
+      "next_stage": "Decorating",
+      "status": "WAITING",
+      "priority": "NORMAL"
+    },
+    {
+      "batch_no": "20251231",
+      "product": "Chiffon Cake",
+      "department": "Packing",
+      "next_stage": "Packing",
+      "status": "URGENT",
+      "priority": "HIGH"
+    }
+  ]
+}
