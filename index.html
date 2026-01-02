@@ -1,275 +1,141 @@
 <!doctype html>
 <html lang="zh-HK">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Breadtop HACCP Production Board</title>
+<head>
+  <meta charset="UTF-8" />
+  <title>Breadtop Production Queue</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-    <!-- React (CDN) -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0b1020;
+      color: #fff;
+      font-family: system-ui, -apple-system, Arial;
+    }
 
-    <style>
-      :root{
-        --bg:#0b1020;
-        --card:#111a33;
-        --text:#e9ecf5;
-        --muted:#b8c0d9;
-        --line:rgba(255,255,255,0.10);
+    .wrap {
+      padding: 20px;
+    }
 
-        --ready:#1f8a4c;
-        --processing:#b98500;
-        --hold:#b53a3a;
-      }
+    h1 {
+      margin: 0 0 5px;
+      font-size: 28px;
+    }
 
-      *{box-sizing:border-box}
-      body{
-        margin:0;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "PingFang HK", "Microsoft JhengHei", sans-serif;
-        background:linear-gradient(180deg, #060a14, var(--bg));
-        color:var(--text);
-      }
+    .meta {
+      color: #bbb;
+      margin-bottom: 15px;
+    }
 
-      .wrap{
-        padding:18px 22px;
-      }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
 
-      .topbar{
-        display:flex;
-        align-items:flex-end;
-        justify-content:space-between;
-        gap:16px;
-        margin-bottom:14px;
-      }
+    .card {
+      background: #111a33;
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
+      border-left: 10px solid #2ecc71;
+    }
 
-      .title{
-        font-size:28px;
-        font-weight:800;
-        letter-spacing:0.2px;
-      }
+    .urgent {
+      animation: blink 1s infinite;
+    }
 
-      .subtitle{
-        color:var(--muted);
-        font-size:14px;
-        margin-top:2px;
-      }
+    @keyframes blink {
+      50% { border-left-color: #ff0000; }
+    }
 
-      .meta{
-        text-align:right;
-        color:var(--muted);
-        font-size:14px;
-        line-height:1.35;
-      }
+    .product-zh {
+      font-size: 22px;
+      font-weight: 800;
+    }
 
-      /* 3 per row on wide screens */
-      .grid{
-        display:grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap:14px;
-      }
+    .product-en {
+      font-size: 14px;
+      color: #bbb;
+      margin-bottom: 10px;
+    }
 
-      /* responsive fallback */
-      @media (max-width: 1200px){
-        .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      }
-      @media (max-width: 820px){
-        .grid{ grid-template-columns: 1fr; }
-      }
+    .row {
+      margin: 6px 0;
+      font-size: 16px;
+    }
 
-      .card{
-        background:rgba(17,26,51,0.85);
-        border:1px solid var(--line);
-        border-radius:16px;
-        padding:14px 14px 12px;
-        box-shadow:0 10px 30px rgba(0,0,0,0.25);
-        overflow:hidden;
-        position:relative;
-        min-height: 170px;
-      }
+    .label {
+      color: #aaa;
+    }
+  </style>
+</head>
 
-      .statusBar{
-        position:absolute;
-        left:0; top:0; right:0;
-        height:8px;
-      }
+<body>
+<div id="root"></div>
 
-      .row{
-        display:flex;
-        align-items:flex-start;
-        justify-content:space-between;
-        gap:10px;
-      }
+<script>
+const e = React.createElement;
 
-      .pname-zh{
-        font-size:22px;
-        font-weight:900;
-        line-height:1.15;
-        margin:2px 0 4px;
-      }
-      .pname-en{
-        font-size:14px;
-        color:var(--muted);
-        margin:0 0 10px;
-      }
+function Card({item}) {
+  return e("div", {
+    className: "card " + (item.priority === "urgent" ? "urgent" : ""),
+    style: { borderLeftColor: item.color }
+  }, [
+    e("div", { className: "product-zh" }, item.product_zh),
+    e("div", { className: "product-en" }, item.product_en),
 
-      .badge{
-        padding:6px 10px;
-        border-radius:999px;
-        font-size:13px;
-        font-weight:800;
-        border:1px solid var(--line);
-        white-space:nowrap;
-      }
+    e("div", { className: "row" },
+      e("span", { className: "label" }, "批次 Batch： "),
+      item.batch_no
+    ),
 
-      .kv{
-        display:grid;
-        grid-template-columns: 92px 1fr;
-        gap:8px 10px;
-        font-size:15px;
-        margin-top:6px;
-      }
-      .k{
-        color:var(--muted);
-      }
-      .v{
-        font-weight:800;
-      }
+    e("div", { className: "row" },
+      e("span", { className: "label" }, "數量 Qty： "),
+      item.batch_count + " 批"
+    ),
 
-      .next{
-        margin-top:10px;
-        padding-top:10px;
-        border-top:1px dashed var(--line);
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:12px;
-      }
+    e("div", { className: "row" },
+      e("span", { className: "label" }, "下一步 Next： "),
+      item.next_stage
+    ),
 
-      .nextText{
-        font-size:15px;
-      }
+    e("div", { className: "row" },
+      e("span", { className: "label" }, "狀態 Status： "),
+      "準備好 READY ✅"
+    )
+  ]);
+}
 
-      .hint{
-        margin-top:10px;
-        color:var(--muted);
-        font-size:13px;
-      }
+function App() {
+  const [data, setData] = React.useState(null);
 
-      .empty{
-        color:var(--muted);
-        padding:24px;
-        border:1px dashed var(--line);
-        border-radius:14px;
-        text-align:center;
-      }
-    </style>
-  </head>
+  async function load() {
+    const res = await fetch("queue.json?ts=" + Date.now());
+    const json = await res.json();
+    setData(json);
+  }
 
-  <body>
-    <div id="root"></div>
+  React.useEffect(() => {
+    load();
+    setInterval(load, 30000); // auto refresh
+  }, []);
 
-    <script>
-      const e = React.createElement;
+  if (!data) return e("div", null, "Loading...");
 
-      function statusLabel(status){
-        const s = (status || "").toUpperCase();
-        if(s === "READY") return { zh:"準備好", en:"READY", color:"var(--ready)" };
-        if(s === "PROCESSING") return { zh:"進行中", en:"PROCESSING", color:"var(--processing)" };
-        if(s === "HOLD") return { zh:"暫停", en:"HOLD", color:"var(--hold)" };
-        return { zh:"未知", en:"UNKNOWN", color:"rgba(255,255,255,0.25)" };
-      }
+  return e("div", { className: "wrap" }, [
+    e("h1", null, "生產隊列 Production Queue"),
+    e("div", { className: "meta" },
+      `日期 ${data.date} ｜ 更新 ${data.generated_at}`
+    ),
+    e("div", { className: "grid" },
+      data.queue.map((q, i) => e(Card, { item: q, key: i }))
+    )
+  ]);
+}
 
-      function safe(v, fallback="—"){
-        if(v === null || v === undefined || v === "") return fallback;
-        return String(v);
-      }
-
-      function Card({item}){
-        const st = statusLabel(item.status);
-
-        return e("div", { className:"card" },
-          e("div", { className:"statusBar", style:{ background: st.color } }),
-
-          e("div", { className:"row" },
-            e("div", null,
-              e("div", { className:"pname-zh" }, safe(item.product_zh)),
-              e("div", { className:"pname-en" }, safe(item.product_en))
-            ),
-            e("div", { className:"badge", style:{ borderColor: st.color, color: st.color } },
-              `${st.zh} ✅ / ${st.en}`
-            )
-          ),
-
-          e("div", { className:"kv" },
-            e("div", { className:"k" }, "批次 Batch"),
-            e("div", { className:"v" }, safe(item.batch)),
-
-            e("div", { className:"k" }, "數量 Qty"),
-            e("div", { className:"v" }, `${safe(item.quantity)} 批 / batches`),
-
-            e("div", { className:"k" }, "部門 Dept"),
-            e("div", { className:"v" }, safe(item.department, "Sponge/Cake"))
-          ),
-
-          e("div", { className:"next" },
-            e("div", { className:"nextText" },
-              `下一步 Next: ${safe(item.next_stage_zh, "包裝")} / ${safe(item.next_stage_en, "Packing")}`
-            ),
-            e("div", { className:"k" },
-              item.ready_at ? `Ready @ ${item.ready_at}` : ""
-            )
-          ),
-
-          e("div", { className:"hint" },
-            "Powered by Breadtop HACCP IT System"
-          )
-        );
-      }
-
-      function App(){
-        const [data, setData] = React.useState({ date:"", updated_at:"", items:[] });
-        const [err, setErr] = React.useState("");
-
-        async function load(){
-          try{
-            setErr("");
-            // cache bust
-            const url = "daily_production.json?ts=" + Date.now();
-            const res = await fetch(url, { cache:"no-store" });
-            if(!res.ok) throw new Error("Cannot load JSON");
-            const json = await res.json();
-            setData(json);
-          }catch(ex){
-            setErr(String(ex));
-          }
-        }
-
-        React.useEffect(() => {
-          load();
-          const t = setInterval(load, 30000); // 30s refresh
-          return () => clearInterval(t);
-        }, []);
-
-        return e("div", { className:"wrap" },
-          e("div", { className:"topbar" },
-            e("div", null,
-              e("div", { className:"title" }, "Breadtop Production Display / 生產顯示板"),
-              e("div", { className:"subtitle" }, "Auto-refresh every 30s • 多裝置同步 • 中英對照")
-            ),
-            e("div", { className:"meta" },
-              e("div", null, `Date: ${safe(data.date, "—")}`),
-              e("div", null, `Updated: ${safe(data.updated_at, "—")}`),
-              err ? e("div", { style:{ color:"#ffb4b4" } }, `Error: ${err}`) : null
-            )
-          ),
-
-          (data.items && data.items.length)
-            ? e("div", { className:"grid" }, data.items.map((it, idx) => e(Card, { item: it, key: idx })))
-            : e("div", { className:"empty" }, "暫時未有今日生產資料 / No items yet")
-        );
-      }
-
-      ReactDOM.createRoot(document.getElementById("root")).render(e(App));
-    </script>
-  </body>
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
 </html>
