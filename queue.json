@@ -3,6 +3,39 @@
   "generated_at": "2025-12-08 16:05",
   "queue": [
     {
+      "product_en": "Swiss Roll (GT)",
+      "product_zh": "瑞士卷（GT）",
+      "batch_no": "20251208",
+      "batch_count": 20,
+      "next_stage_en": "Ready for Packing",
+      "next_stage_zh": "準備包裝",
+      "status_en": "READY",
+      "status_zh": "準備好",
+      "color": "green"
+    },
+    {
+      "product_en": "Plain Sponge",
+      "product_zh": "原味海綿蛋糕",
+      "batch_no": "20251208",
+      "batch_count": 17,
+      "next_stage_en": "Ready for Decorating",
+      "next_stage_zh": "準備裝飾",
+      "status_en": "READY",
+      "status_zh": "準備好",
+      "color": "yellow"
+    },
+    {
+      "product_en": "Rainbow Sponge",
+      "product_zh": "彩虹海綿蛋糕",
+      "batch_no": "20251208",
+      "batch_count": 15,
+      "next_stage_en": "Ready for Decorating",
+      "next_stage_zh": "準備裝飾",
+      "status_en": "READY",
+      "status_zh": "準備好",
+      "color": "yellow"
+    },
+    {
       "product_en": "Boston Cake",
       "product_zh": "波士頓蛋糕",
       "batch_no": "20251208",
@@ -18,6 +51,28 @@
       "product_zh": "戚風蛋糕",
       "batch_no": "20251208",
       "batch_count": 3,
+      "next_stage_en": "Ready for Packing",
+      "next_stage_zh": "準備包裝",
+      "status_en": "READY",
+      "status_zh": "準備好",
+      "color": "green"
+    },
+    {
+      "product_en": "JP Chiffon Cake 5inch - Pandan",
+      "product_zh": "日式 5 吋香蘭戚風蛋糕",
+      "batch_no": "20251208",
+      "batch_count": 4,
+      "next_stage_en": "Ready for Packing",
+      "next_stage_zh": "準備包裝",
+      "status_en": "READY",
+      "status_zh": "準備好",
+      "color": "green"
+    },
+    {
+      "product_en": "Chocolate Sponge",
+      "product_zh": "朱古力海綿蛋糕",
+      "batch_no": "20251208",
+      "batch_count": 10,
       "next_stage_en": "Ready for Decorating",
       "next_stage_zh": "準備裝飾",
       "status_en": "READY",
@@ -25,10 +80,10 @@
       "color": "yellow"
     },
     {
-      "product_en": "Swiss Roll (GT)",
-      "product_zh": "瑞士卷（GT）",
+      "product_en": "Vanilla Sponge Base",
+      "product_zh": "雲呢拿海綿蛋糕底",
       "batch_no": "20251208",
-      "batch_count": 20,
+      "batch_count": 12,
       "next_stage_en": "Ready for Mixing",
       "next_stage_zh": "準備攪拌",
       "status_en": "READY",
